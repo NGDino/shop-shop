@@ -4,6 +4,7 @@ import { pluralize } from "../../utils/helpers"
 
 import{ useStoreContext } from '../../utils/GlobalState';
 import {ADD_TO_CART, UPDATE_CART_QUANTITY } from '../../utils/actions';
+import CartItem from "../CartItem";
 
 function ProductItem(item) {
   const {
@@ -16,12 +17,26 @@ function ProductItem(item) {
 
   const [state, dispatch] = useStoreContext();
 
+  const {cart} = state
+
   const addToCart = () =>{
-    dispatch({ 
-      type: ADD_TO_CART,
-      product: {...item, purchaseQuantity: 1}
-    })
-  }
+    //find the cart item with matching id
+    const itemInCart = cart.find((CartItem) => CartItem._id === _id);
+
+    //if there is match call UPDATE with a new purchase quantity
+    if(itemInCart){
+      dispatch({
+        type: UPDATE_CART_QUANTITY,
+        _id: _id,
+        purchaseQuantity: parseInt(itemInCart.purchaseQuantity) + 1
+      });
+    }else{
+      dispatch({ 
+        type: ADD_TO_CART,
+        product: {...item, purchaseQuantity: 1}
+      });
+    }
+  };
   return (
     <div className="card px-1 py-1">
       <Link to={`/products/${_id}`}>
